@@ -26,7 +26,13 @@ from features.visual import visual
 import pandas as pd
 import numpy as np
 
+def block():
+    print("\n=============================================\n")
 
+def welcome():
+    block()
+    print('Starting Program')
+    block()
 ##########################
 # Main
 def clear():
@@ -34,6 +40,9 @@ def clear():
 
 def main():
     clear()
+
+    welcome()
+
     engine = None
     table_con = None
     df_con = None
@@ -59,7 +68,7 @@ def main():
         if table_con is None:
             csv_path = input(r'Press ENTER or provide a CSV path: ').strip() #r to reverse '/' 
             table_name = input('Enter table name to CREATE or CONNECT to a table: ').strip()   
-
+            block()
             df_con = create_table_from_csv(engine, csv_path, table_name)
             if df_con is not None:
                 table_con = table_name
@@ -73,6 +82,7 @@ def main():
 
 
     # main menu 
+        block()
         print(f'\n Select the index Options Below for {table_con}')
         print('1. Create Row')
         print('2. Read Row')
@@ -82,38 +92,51 @@ def main():
         print('6. Show Visualization')
         print('7. Connect to a Databse')
         print('8. Exit')
-
+        
 
 # connection to choicesss
         choice = input('Enter your choice (1-8): ').strip()
+        block()
         
         if choice == '1':
             create_c(engine, table_con)
             print(input('\nPress ENTER to continue . . . '))
+
+            block()
         elif choice == '2':
             read_r(engine, table_con)
             print(input('\nPress ENTER to continue . . . '))
+
+            block()
         elif choice == '3':
             update_u(engine, table_con)
             print(input('\nPress ENTER to continue . . . '))
+
+            block()
         elif choice == '4':
             result = delete_d(engine, table_con)
             if result == "TABLE_DROPPED":
                 table_con = None   # return to CSV selection step
             print(input('\nPress ENTER to continue . . . '))
+
+            block()
         elif choice == '5':
             stats(engine, table_con)
             print(input('\nPress ENTER to continue . . . '))
+
+            block()
         elif choice == '6':
             visual(engine, table_con)
             print(input('\nPress ENTER to continue . . . '))
+
+            block()
         elif choice == '7':
             print("\nConnecting database...")
             engine = None
             table_con = None
             df_con = None
             continue 
-
+            
         elif choice == '8':
             print("\nTerminating Program .. . .  .   .")
             break
