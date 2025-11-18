@@ -66,5 +66,3 @@ Amjad Muhammad Ahsan - Participant of Job Connector AI Engineering – Purwadhik
 Capstone Project 1
 
 ---
-
-Tell me if you want it customized with your name, project description, features list, or example output.
