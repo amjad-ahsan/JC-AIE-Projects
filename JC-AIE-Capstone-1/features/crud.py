@@ -276,8 +276,8 @@ def delete_d(engine, table_name):
     try:
         print("\n DELETE OPTIONS")
         print("1 Delete rows WHERE column = value")
-        print("2 Delete ALL rows (TRUNCATE)")
-        print("3 DROP table (cannot be undone)")
+        print("2 Delete ALL rows")
+        print("3 DROP table (permanent)")
 
         choice = input("Enter choice (1-3): ").strip()
 
