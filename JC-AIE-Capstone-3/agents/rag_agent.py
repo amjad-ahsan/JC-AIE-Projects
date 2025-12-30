@@ -102,7 +102,11 @@ def rag_agent(state: AgentState) -> AgentState:
 
     #  if to few results, fill with raw
     if not docs:
-        docs = raw_docs[:10]
+        if prefs.get("year_filter") or prefs.get("format") or prefs.get("status"):
+            docs = []
+        else:
+            docs = raw_docs[:10]
+
 
     # ranking by score + popularity
     docs = sorted(
