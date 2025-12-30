@@ -2,7 +2,8 @@ import streamlit as st
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
 from agents.graph import app_graph
-from langfuse import CallbackHandler
+from langfuse.langchain import CallbackHandler
+
 
 import time
 import uuid
