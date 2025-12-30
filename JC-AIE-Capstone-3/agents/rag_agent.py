@@ -38,7 +38,7 @@ def filter_contraints(docs, prefs):
         yf = prefs.get("year_filter")
         if yf:
             y = d.get("seasonYear")
-            if not y:
+            if y is None:
                 continue
             if "gte" in yf and y < yf["gte"]:
                 continue
@@ -48,7 +48,7 @@ def filter_contraints(docs, prefs):
         ef = prefs.get("episodes_filter")
         if ef:
             ep = d.get("episodes")
-            if ep:
+            if ep is not None:
                 if "gte" in ef and ep < ef["gte"]:
                     continue
                 if "lte" in ef and ep > ef["lte"]:
@@ -57,7 +57,7 @@ def filter_contraints(docs, prefs):
         df = prefs.get("duration_filter")
         if df:
             dur = d.get("duration")
-            if dur:
+            if dur is not None:
                 if "gte" in df and dur < df["gte"]:
                     continue
                 if "lte" in df and dur > df["lte"]:
@@ -81,6 +81,7 @@ def filter_contraints(docs, prefs):
         results.append(d)
 
     return results
+
 
 
 # rag agent
