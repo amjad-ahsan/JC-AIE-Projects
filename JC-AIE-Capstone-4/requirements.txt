@@ -4,6 +4,6 @@ torch
 torchvision
 torchaudio
 opencv-python-headless==4.9.0.80
-numpy<2
+numpy
 pandas
 matplotlib
