@@ -29,7 +29,8 @@ uploaded_file = st.file_uploader("Upload a food image", type=["jpg", "png", "jpe
 
 if uploaded_file:
     image = Image.open(uploaded_file)
-    st.image(image, caption="Uploaded Image", width="stretch")
+    st.image(image_path, caption="Uploaded Image", use_column_width=True)
+
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
         image.save(tmp.name)
