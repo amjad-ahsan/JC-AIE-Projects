@@ -3,49 +3,40 @@ from func.calorie_map import get_calorie_info
 
 import numpy as np
 from PIL import Image
+import onnxruntime as ort
 
-_model = None  # global cached model
+# Load ONNX model once
+session = ort.InferenceSession("model/best.onnx", providers=["CPUExecutionProvider"])
+
+# 🔴 REPLACE with your actual class names in training order
+CLASS_NAMES = ["class1", "class2", "class3"]
 
 
-def get_model():
-    """Load YOLO model only once (lazy load for Streamlit)."""
-    global _model
-    if _model is None:
-        import os
-        os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1"  # helps avoid some OpenCV backend issues
-
-        from ultralytics import YOLO  # import here to prevent startup crash
-        _model = YOLO("model/best.pt")
-
-    return _model
+def preprocess(image_path, img_size=640):
+    img = Image.open(image_path).convert("RGB")
+    img = img.resize((img_size, img_size))
+    img_array = np.array(img).astype(np.float32) / 255.0
+    img_array = np.transpose(img_array, (2, 0, 1))
+    img_array = np.expand_dims(img_array, axis=0)
+    return img_array
 
 
 def analyze_image(image_path, conf=0.25):
-    """
-    Food detection and calorie counting based on detected items only.
-    Uses PIL instead of OpenCV to load images (Streamlit-safe).
-    """
-    model = get_model()
-
-    # Load image with PIL instead of cv2
-    img = Image.open(image_path).convert("RGB")
-    img_array = np.array(img)
-
-    # Run YOLO detection
-    results = model(img_array, conf=conf, iou=0.6, imgsz=640)[0]
+    img_input = preprocess(image_path)
+    outputs = session.run(None, {"images": img_input})[0]
 
     foods = []
-    for box in results.boxes:
-        label = model.names[int(box.cls)]
-        confidence = float(box.conf)
-        foods.append((label, confidence))
+    for det in outputs[0]:
+        score = float(det[4])
+        if score < 0.4:
+            continue
+        class_id = int(det[5])
+        label = CLASS_NAMES[class_id]
+        foods.append((label, score))
 
     summary = defaultdict(lambda: {"count": 0, "conf": []})
-    CONF_THRESHOLD = 0.4
 
     for label, conf_score in foods:
-        if conf_score < CONF_THRESHOLD:
-            continue
         summary[label]["count"] += 1
         summary[label]["conf"].append(conf_score)
 
@@ -57,7 +48,8 @@ def analyze_image(image_path, conf=0.25):
         calories, unit = get_calorie_info(food)
         total_calories += calories * data["count"]
 
-    return counts, avg_conf, int(total_calories), results
+    return counts, avg_conf, int(total_calories), None
+
 
 
 
