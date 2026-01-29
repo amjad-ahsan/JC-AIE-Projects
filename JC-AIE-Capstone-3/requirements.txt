@@ -1,0 +1,21 @@
+streamlit
+
+# LangChain & Agents
+langchain
+langchain-core
+langchain-community
+langchain-openai
+langgraph
+
+# LLM & Utilities
+openai
+tiktoken
+pydantic
+requests
+python-dotenv
+
+# Vector DB
+qdrant-client
+
+# Observability
+langfuse
