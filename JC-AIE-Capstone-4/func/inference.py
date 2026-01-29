@@ -24,8 +24,10 @@ CLASS_NAMES = [
     "telur mata sapi",
     "telur rebus",
     "tempe",
-    "tumis buncis"
+    "tumis buncis",
+    "food-z7p4"  # extra class (will be ignored in calorie map)
 ]
+
 
 
 def analyze_image(image_path, conf=0.25):
