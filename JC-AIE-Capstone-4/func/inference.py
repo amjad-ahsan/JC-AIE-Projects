@@ -9,7 +9,21 @@ import onnxruntime as ort
 session = ort.InferenceSession("model/best.onnx", providers=["CPUExecutionProvider"])
 
 # PUT YOUR REAL LABEL NAMES HERE IN TRAINING ORDER
-CLASS_NAMES = ["class1", "class2", "class3"]
+CLASS_NAMES = [
+    "ayam goreng",
+    "capcay",
+    "nasi",
+    "sayur bayam",
+    "sayur kangkung",
+    "sayur sop",
+    "tahu",
+    "telur dadar",
+    "telur mata sapi",
+    "telur rebus",
+    "tempe",
+    "tumis buncis"
+]
+
 
 
 def analyze_image(image_path, conf=0.25):
