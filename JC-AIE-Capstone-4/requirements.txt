@@ -3,6 +3,7 @@ ultralytics
 torch
 torchvision
 torchaudio
+opencv-python-headless
 
 pandas
 opencv-python-headless
