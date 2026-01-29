@@ -1,15 +1,23 @@
-from ultralytics import YOLO
 from collections import defaultdict
 from func.calorie_map import get_calorie_info
 
-model = YOLO("model/best.pt")
+_model = None  # cache model so it only loads once
 
- # path to trained model
+
+def get_model():
+    global _model
+    if _model is None:
+        from ultralytics import YOLO
+        _model = YOLO("model/best.pt")  # path to trained model
+    return _model
+
 
 def analyze_image(image_path, conf=0.25):
     """
     Food detection and calorie counting based on detected items only.
     """
+
+    model = get_model()
 
     results = model(image_path, conf=conf, iou=0.6, imgsz=640)[0] # change imgsz if needed this also run the detektion using yolo
 
@@ -49,6 +57,7 @@ def analyze_image(image_path, conf=0.25):
         total_calories += calories * data["count"]
 
     return counts, avg_conf, int(total_calories), results
+
 
 
 
