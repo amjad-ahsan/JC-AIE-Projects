@@ -1,55 +1,35 @@
+from ultralytics import YOLO
 from collections import defaultdict
 from func.calorie_map import get_calorie_info
+import os
+import gdown
 
-import numpy as np
-from PIL import Image
-import onnxruntime as ort
+MODEL_PATH = "model/best.pt"
+FILE_ID = "16B-a8J_hmtTLWb98HRTil4Aukk5TSTEH"  # your Drive file ID
 
-# load exported ONNX model instead of YOLO .pt (Streamlit-safe)
-session = ort.InferenceSession("model/best.onnx", providers=["CPUExecutionProvider"])
+# Download model if not already present
+if not os.path.exists(MODEL_PATH):
+    os.makedirs("model", exist_ok=True)
+    url = f"https://drive.google.com/uc?id={FILE_ID}"
+    gdown.download(url, MODEL_PATH, quiet=False)
 
-# PUT YOUR REAL LABEL NAMES HERE IN TRAINING ORDER
-CLASS_NAMES = [
-    "ayam goreng",
-    "capcay",
-    "nasi",
-    "sayur bayam",
-    "sayur kangkung",
-    "sayur sop",
-    "tahu",
-    "telur dadar",
-    "telur mata sapi",
-    "telur rebus",
-    "tempe",
-    "tumis buncis"
-]
+model = YOLO(MODEL_PATH)
 
-
+ # path to trained model
 
 def analyze_image(image_path, conf=0.25):
     """
     Food detection and calorie counting based on detected items only.
     """
 
-    # Load and prepare image (instead of YOLO doing it internally)
-    img = Image.open(image_path).convert("RGB")
-    img = img.resize((640, 640))  # change imgsz if needed this also run the detektion using yolo
-    img_array = np.array(img).astype(np.float32) / 255.0
-    img_array = np.transpose(img_array, (2, 0, 1))  # HWC → CHW
-    img_array = np.expand_dims(img_array, axis=0)
-
-    # run the detection using exported YOLO model
-    outputs = session.run(None, {"images": img_array})[0]
+    results = model(image_path, conf=conf, iou=0.6, imgsz=640)[0] # change imgsz if needed this also run the detektion using yolo
 
     foods = []
 
     #for each box detected in the results/ keep info
-    for det in outputs[0]:
-        confidence = float(det[4])  # show confidence
-        if confidence < 0.01:  # filter super low predictions early
-            continue
-        class_id = int(det[5])
-        label = CLASS_NAMES[class_id]  # give label
+    for box in results.boxes:
+        label = model.names[int(box.cls)] #give label
+        confidence = float(box.conf) #show confidence
         foods.append((label, confidence))
 
     summary = defaultdict(lambda: {"count": 0, "conf": []})
@@ -79,7 +59,8 @@ def analyze_image(image_path, conf=0.25):
         calories, unit = get_calorie_info(food)
         total_calories += calories * data["count"]
 
-    return counts, avg_conf, int(total_calories), None
+    return counts, avg_conf, int(total_calories), results
+
 
 
 
