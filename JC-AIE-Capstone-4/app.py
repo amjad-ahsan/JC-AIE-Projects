@@ -39,7 +39,7 @@ if uploaded_file:
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
     with st.spinner("Analyzing food items..."):
-        counts, avg_conf, total_calories, results = analyze_image(image_path, conf=confidence)
+        counts, avg_conf, total_calories, _ = analyze_image(image_path, conf=confidence)
 
     total_items = sum(counts.values())
 
@@ -70,6 +70,7 @@ if uploaded_file:
 
 else:
     st.info("Upload an image to begin calorie estimation.")
+
 
 
 
