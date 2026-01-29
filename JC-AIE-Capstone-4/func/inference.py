@@ -1,25 +1,38 @@
 from collections import defaultdict
 from func.calorie_map import get_calorie_info
 
-_model = None  # global cache
+import numpy as np
+from PIL import Image
+
+_model = None  # global cached model
 
 
 def get_model():
-    """Load YOLO model only once (lazy load)."""
+    """Load YOLO model only once (lazy load for Streamlit)."""
     global _model
     if _model is None:
-        from ultralytics import YOLO  # import here to avoid Streamlit startup crash
+        import os
+        os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1"  # helps avoid some OpenCV backend issues
+
+        from ultralytics import YOLO  # import here to prevent startup crash
         _model = YOLO("model/best.pt")
+
     return _model
 
 
 def analyze_image(image_path, conf=0.25):
     """
     Food detection and calorie counting based on detected items only.
+    Uses PIL instead of OpenCV to load images (Streamlit-safe).
     """
     model = get_model()
 
-    results = model(image_path, conf=conf, iou=0.6, imgsz=640)[0]
+    # Load image with PIL instead of cv2
+    img = Image.open(image_path).convert("RGB")
+    img_array = np.array(img)
+
+    # Run YOLO detection
+    results = model(img_array, conf=conf, iou=0.6, imgsz=640)[0]
 
     foods = []
     for box in results.boxes:
@@ -45,6 +58,7 @@ def analyze_image(image_path, conf=0.25):
         total_calories += calories * data["count"]
 
     return counts, avg_conf, int(total_calories), results
+
 
 
 
